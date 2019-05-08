@@ -1,6 +1,6 @@
 {
   "name": "node-hidspy",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An event based node.js c++ addon/binding to detect the hid device insertion/removal and notify the subscribed apps.",
   "main": "index.js",
   "scripts": {
@@ -30,8 +30,8 @@
   "license": "ISC",
   "gypfile": true,
   "dependencies": {
-    "bindings": "^1.3.0",
-    "es6-promise": "^4.2.2",
+    "bindings": "^1.5.0",
+    "es6-promise": "^4.2.6",
     "nan": "^2.13.2",
     "prebuild-install": "^2.5.3"
   },

@@ -3,7 +3,6 @@
     {
       "target_name": "hidspy",
       "sources": [
-        "src/usbs.h",
         "src/usbspy.h",
         "src/usbspy.cpp"
       ],
