@@ -6,8 +6,8 @@ std::mutex m;
 std::condition_variable cv;
 bool ready = false;
 
-void processData(const typename AsyncProgressQueueWorker<Device>::ExecutionProgress &progress);
-v8::Local<v8::Value> Preparev8Object(const Device *data);
+void processData(const typename AsyncProgressQueueWorker<Deivce>::ExecutionProgress &progress);
+v8::Local<v8::Value> Preparev8Object(const Deivce *data);
 
 template <typename T>
 class USBSpyWorker : public AsyncProgressQueueWorker<T>
@@ -35,7 +35,6 @@ class USBSpyWorker : public AsyncProgressQueueWorker<T>
 
 		lk.unlock();
 		cv.notify_one();
-		ClearUSBDeviceList();
 	}
 
 	void HandleProgressCallback(const T *data, size_t count)
@@ -69,7 +68,7 @@ NAN_METHOD(SpyOn)
 	Callback *notify = new Callback(To<v8::Function>(info[2]).ToLocalChecked());
 #endif
 
-	AsyncQueueWorker(new USBSpyWorker<Device>(callback, progress));
+	AsyncQueueWorker(new USBSpyWorker<Deivce>(callback, progress));
 #if defined(_TEST_NODE_) || !defined(_DEBUG)
 	notify->Call(0, NULL); // notify everything is ready!
 #endif
@@ -84,48 +83,14 @@ NAN_METHOD(SpyOff)
 	cv.notify_one();
 }
 
-NAN_METHOD(GetAvailableUSBStorageDevices)
-{
-	std::list<Device *> usbs = GetUSBStorageDevices();
-	v8::Local<v8::Array> result = Nan::New<v8::Array>(usbs.size());
-
-	std::list<Device *>::iterator it;
-	int i = 0;
-	for (it = usbs.begin(); it != usbs.end(); ++it)
-	{
-		v8::Local<v8::Value> val = Preparev8Object(*it);
-		Nan::Set(result, i, val);
-		i++;
-	}
-
-	info.GetReturnValue().Set(result);
-}
-
-NAN_METHOD(GetUSBStorageDeviceByPropertyName)
-{
-	if (info.Length() < 2)
-	{
-		return Nan::ThrowSyntaxError("getUSBStorageDeviceByPropertyName function should called with paramters property_name and the corresponding value.");
-	}
-
-	std::string property_name(*v8::String::Utf8Value(info[0]->ToString()));
-	std::string value(*v8::String::Utf8Value(info[1]->ToString()));
-
-	Device *device = GetUSBStorageDeviceByPropertyName(property_name, value);
-
-	info.GetReturnValue().Set(Preparev8Object(device));
-}
-
 NAN_MODULE_INIT(Init)
 {
 	Set(target, New<v8::String>("spyOn").ToLocalChecked(), New<v8::FunctionTemplate>(SpyOn)->GetFunction());
 	Set(target, New<v8::String>("spyOff").ToLocalChecked(), New<v8::FunctionTemplate>(SpyOff)->GetFunction());
-	Set(target, New<v8::String>("getAvailableUSBStorageDevices").ToLocalChecked(), New<v8::FunctionTemplate>(GetAvailableUSBStorageDevices)->GetFunction());
-	Set(target, New<v8::String>("getUSBStorageDeviceByPropertyName").ToLocalChecked(), New<v8::FunctionTemplate>(GetUSBStorageDeviceByPropertyName)->GetFunction());
 	StartSpying();
 }
 
-v8::Local<v8::Value> Preparev8Object(const Device *data)
+v8::Local<v8::Value> Preparev8Object(const Deivce *data)
 {
 	v8::Local<v8::Object> device = Nan::New<v8::Object>();
 
@@ -137,31 +102,13 @@ v8::Local<v8::Value> Preparev8Object(const Device *data)
 			New<v8::Number>(0));
 		return device;
 	}
-
-	Nan::Set(
-		device,
-		Nan::New("device_number").ToLocalChecked(),
-		New<v8::Number>(data->device_number));
-	Nan::Set(
-		device,
-		Nan::New("device_status").ToLocalChecked(),
-		New<v8::Number>(data->device_status));
-	Nan::Set(
-		device,
-		Nan::New("vendor_id").ToLocalChecked(),
-		New<v8::String>(data->vendor_id.c_str()).ToLocalChecked());
-	Nan::Set(
-		device,
-		Nan::New("serial_number").ToLocalChecked(),
-		New<v8::String>(data->serial_number.c_str()).ToLocalChecked());
-	Nan::Set(
-		device,
-		Nan::New("product_id").ToLocalChecked(),
-		New<v8::String>(data->product_id.c_str()).ToLocalChecked());
-	Nan::Set(
-		device,
-		Nan::New("drive_letter").ToLocalChecked(),
-		New<v8::String>(data->device_letter.c_str()).ToLocalChecked());
+        
+    Nan::Set(device, Nan::New("name").ToLocalChecked(), New<v8::String>(data->szDeviceName).ToLocalChecked());
+    Nan::Set(device, Nan::New("vid").ToLocalChecked(),  New<v8::Number>(data->dwVID));
+    Nan::Set(device, Nan::New("pid").ToLocalChecked(),  New<v8::Number>(data->dwPID));
+    Nan::Set(device, Nan::New("interface").ToLocalChecked(),  New<v8::Number>(data->dwInterface));
+    Nan::Set(device, Nan::New("guid").ToLocalChecked(), New<v8::String>(data->szGuid).ToLocalChecked());
+    Nan::Set(device, Nan::New("status").ToLocalChecked(), New<v8::Number>((int)data->status));
 
 	return device;
 }
@@ -180,4 +127,4 @@ void StartSpying()
 #endif
 }
 
-NODE_MODULE(usbspy, Init)
+NODE_MODULE(hidspy, Init)

@@ -1,11 +1,12 @@
 {
-  "name": "node-usbspy",
-  "version": "1.1.5",
-  "description": "An event based node.js c++ addon/binding to retrive the connected usb storage devices and detect the storage device insertion/removal and notify the subscribed apps",
+  "name": "node-hidspy",
+  "version": "1.0.0",
+  "description": "An event based node.js c++ addon/binding to detect the hid device insertion/removal and notify the subscribed apps.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "rebuild": "node-gyp rebuild"
+    "test": "node example/test.js",
+    "rebuild": "node-gyp rebuild",
+    "configure": "node-gyp configure"
   },
   "keywords": [
     "usb",
@@ -31,7 +32,7 @@
   "dependencies": {
     "bindings": "^1.3.0",
     "es6-promise": "^4.2.2",
-    "nan": "^2.10.0",
+    "nan": "^2.13.2",
     "prebuild-install": "^2.5.3"
   },
   "devDependencies": {

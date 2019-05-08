@@ -1,4 +1,4 @@
-var usbspyBinding = require("bindings")("usbspy.node");
+var hidspyBinding = require("bindings")("hidspy.node");
 var events = require("events");
 
 require("es6-promise/auto");
@@ -8,18 +8,18 @@ var index = require("./package.json");
 if (global[index.name] && global[index.name].version === index.version) {
   module.exports = global[index.name];
 } else {
-  var usbspy = new events.EventEmitter();
+  var hidspy = new events.EventEmitter();
   var ready = false;
 
-  usbspy.spyOn = function(callback) {
+  hidspy.spyOn = function(callback) {
     var promise = new Promise(function(resolve, reject) {
       if (!ready) {
-        usbspyBinding.spyOn(
+        hidspyBinding.spyOn(
           function(data) {
-            usbspy.emit("change", data);
+            hidspy.emit("change", data);
           },
           function(data) {
-            usbspy.emit("end", data);
+            hidspy.emit("end", data);
           },
           function() {
             resolve(true);
@@ -36,23 +36,20 @@ if (global[index.name] && global[index.name].version === index.version) {
     return promise;
   };
 
-  usbspy.spyOff = function() {
+  hidspy.spyOff = function() {
     if (!ready) {
-      usbspyBinding.spyOff();
+      hidspyBinding.spyOff();
       ready = false;
     }
   };
 
-  usbspy.getAvailableUSBStorageDevices = function() {
-    return usbspyBinding.getAvailableUSBStorageDevices();
-  };
+  hidspy.status = {
+    plugin: 1,
+    pullout: 0,
+  }
 
-  usbspy.getUSBStorageDeviceByPropertyName = function(propertyName, value) {
-    return usbspyBinding.getUSBStorageDeviceByPropertyName(propertyName, value);
-  };
+  hidspy.version = index.version;
+  global[index.name] = hidspy;
 
-  usbspy.version = index.version;
-  global[index.name] = usbspy;
-
-  module.exports = usbspy;
+  module.exports = hidspy;
 }
