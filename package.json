@@ -1,6 +1,6 @@
 {
   "name": "node-hidspy",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An event based node.js c++ addon/binding to detect the hid device insertion/removal and notify the subscribed apps.",
   "main": "index.js",
   "scripts": {
@@ -9,7 +9,7 @@
     "configure": "node-gyp configure"
   },
   "keywords": [
-    "usb",
+    "hid",
     "device",
     "hardware",
     "list",
@@ -23,10 +23,10 @@
   ],
   "readme": "ReadMe.md",
   "bugs": {
-    "url": "https://github.com/jaganathanb/node-usbspy/issues"
+    "url": "https://github.com/imlinhanchao/node-hidspy/issues"
   },
-  "author": "Jaganathan B <jaganathan.eswaran@gmail.com>",
-  "homepage": "https://github.com/jaganathanb/node-usbspy",
+  "author": "Hancel.Lin <imlinhanchao@foxmail.com>",
+  "homepage": "https://github.com/imlinhanchao/node-hidspy",
   "license": "ISC",
   "gypfile": true,
   "dependencies": {
